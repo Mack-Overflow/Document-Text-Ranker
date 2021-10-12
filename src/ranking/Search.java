@@ -33,7 +33,12 @@ public class Search {
         // call read
         try {
             // doc = Jsoup.connect(args[1]).get(); // runtime cli argument
-            doc = Jsoup.connect("https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland").get();
+            try {
+                doc = Jsoup.connect(args[1]).get();
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("CLI argument missing (Valid URL). Defaulting to Alice Wiki Entry \n\n");
+                doc = Jsoup.connect("https://en.wikipedia.org/wiki/Alice%27s_Adventures_in_Wonderland").get();
+            }
 
             String title = doc.title();
             System.out.println("Title: " + title);
@@ -59,36 +64,9 @@ public class Search {
                 words.put(key, ++count);
             }
 
-            // for (Entry<String, Integer> result : words.entrySet()) {
-            // System.out.println(result.getKey() + " " + result.getValue());
-            // }
-
-            // for (String el : s) {
-
-            // el = el.toLowerCase();
-            // // check if current word is already in Node
-            // Boolean contains = words.containsKey(el);
-
-            // if (!contains) { // Create new node if none exist
-            // // For this word
-            // Node node = new Node(el, 1);
-            // nodes.put(el, node);
-            // words.computeIfAbsent(el, (w) -> Integer.valueOf(1));
-
-            // } else {
-            // // Change nodes count
-            // Node node = nodes.get(el);
-            // Integer word = words.get(el);
-            // node.count++;
-            // words.computeIfPresent(el, (w, c) -> Integer.valueOf(c.intValue() + 1));
-            // words.put(el, word++);
-            // }
-
-            // }
-
             printLinks(15, links);
-
             printPopular(15, words, nodes);
+            printAlphabetic(15, s);
 
         } catch (
 
@@ -105,6 +83,11 @@ public class Search {
         Set<Entry<String, Integer>> entrySet = words.entrySet();
         List<Entry<String, Integer>> wordList = new ArrayList<>(entrySet);
         Collections.sort(wordList, (o2, o1) -> o1.getValue().compareTo(o2.getValue()));
+
+        // Explanation of incrementing index without causing Index error inside Lambda
+        // function:
+        // https://unsekhable.com/2020/07/31/how-to-resolve-local-variable-defined-in-an-enclosing-scope-must-be-final-or-effectively-final-error/
+
         int[] index = { 0 };
         System.out.printf("Printing most popular %d words \n\n", numWords);
         wordList.forEach(s -> {
@@ -115,6 +98,23 @@ public class Search {
             index[0] += 1;
         });
 
+    }
+
+    public static void printAlphabetic(int numWords, String[] words) {
+        for (int i = 0; i < words.length - 1; i++) {
+            for (int j = i + 1; j < words.length; j++) {
+                if (words[i].compareTo(words[j]) > 0) {
+                    String buff = words[i];
+                    words[i] = words[j];
+                    words[j] = buff;
+                }
+            }
+        }
+        System.out.printf("\n Printing first %d words in alphabetic order\n", numWords);
+        for (int i = 0; i < numWords; i++) {
+            // Print first numWords in the array
+            System.out.println(words[i]);
+        }
     }
     // List<Entry<String, Integer>> unsorted = new LinkedList<>(words.entrySet());
     // Collections.sort(unsorted, new Comparator<Map.Entry<String, Integer>>() {
