@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Search",
+            "request": "launch",
+            "mainClass": "ranking.Search",
+            "projectName": "Project 5_74e7edf9"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
